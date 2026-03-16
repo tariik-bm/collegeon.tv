@@ -1,0 +1,32 @@
+{
+  "poll": "AP Top 25",
+  "updated": "2026-03-08",
+  "season": "2025-26",
+  "rankings": [
+    {"rank":1,"prevRank":1,"seoname":"duke","nameShort":"Duke","conference":"ACC","wins":29,"losses":2,"points":1519,"firstPlaceVotes":56},
+    {"rank":2,"prevRank":2,"seoname":"arizona","nameShort":"Arizona","conference":"Big 12","wins":29,"losses":2,"points":1439,"firstPlaceVotes":4},
+    {"rank":3,"prevRank":3,"seoname":"michigan","nameShort":"Michigan","conference":"Big Ten","wins":29,"losses":2,"points":1434,"firstPlaceVotes":1},
+    {"rank":4,"prevRank":5,"seoname":"florida","nameShort":"Florida","conference":"SEC","wins":25,"losses":6,"points":1337,"firstPlaceVotes":0},
+    {"rank":5,"prevRank":7,"seoname":"houston","nameShort":"Houston","conference":"Big 12","wins":26,"losses":5,"points":1241,"firstPlaceVotes":0},
+    {"rank":6,"prevRank":4,"seoname":"uconn","nameShort":"UConn","conference":"Big East","wins":27,"losses":4,"points":1178,"firstPlaceVotes":0},
+    {"rank":7,"prevRank":6,"seoname":"iowa-st","nameShort":"Iowa State","conference":"Big 12","wins":25,"losses":6,"points":1137,"firstPlaceVotes":0},
+    {"rank":8,"prevRank":8,"seoname":"michigan-st","nameShort":"Michigan State","conference":"Big Ten","wins":25,"losses":6,"points":1083,"firstPlaceVotes":0},
+    {"rank":9,"prevRank":11,"seoname":"illinois","nameShort":"Illinois","conference":"Big Ten","wins":24,"losses":7,"points":1037,"firstPlaceVotes":0},
+    {"rank":10,"prevRank":13,"seoname":"virginia","nameShort":"Virginia","conference":"ACC","wins":27,"losses":4,"points":953,"firstPlaceVotes":0},
+    {"rank":11,"prevRank":9,"seoname":"nebraska","nameShort":"Nebraska","conference":"Big Ten","wins":26,"losses":5,"points":939,"firstPlaceVotes":0},
+    {"rank":12,"prevRank":12,"seoname":"gonzaga","nameShort":"Gonzaga","conference":"WCC","wins":28,"losses":3,"points":846,"firstPlaceVotes":0},
+    {"rank":13,"prevRank":18,"seoname":"st-johns","nameShort":"St. John's","conference":"Big East","wins":25,"losses":6,"points":733,"firstPlaceVotes":0},
+    {"rank":14,"prevRank":14,"seoname":"kansas","nameShort":"Kansas","conference":"Big 12","wins":22,"losses":9,"points":608,"firstPlaceVotes":0},
+    {"rank":15,"prevRank":16,"seoname":"alabama","nameShort":"Alabama","conference":"SEC","wins":23,"losses":8,"points":602,"firstPlaceVotes":0},
+    {"rank":16,"prevRank":10,"seoname":"texas-tech","nameShort":"Texas Tech","conference":"Big 12","wins":22,"losses":9,"points":554,"firstPlaceVotes":0},
+    {"rank":17,"prevRank":20,"seoname":"arkansas","nameShort":"Arkansas","conference":"SEC","wins":23,"losses":8,"points":532,"firstPlaceVotes":0},
+    {"rank":18,"prevRank":15,"seoname":"purdue","nameShort":"Purdue","conference":"Big Ten","wins":23,"losses":8,"points":529,"firstPlaceVotes":0},
+    {"rank":19,"prevRank":17,"seoname":"north-carolina","nameShort":"North Carolina","conference":"ACC","wins":24,"losses":7,"points":488,"firstPlaceVotes":0},
+    {"rank":20,"prevRank":19,"seoname":"miami-oh","nameShort":"Miami (OH)","conference":"MAC","wins":31,"losses":0,"points":420,"firstPlaceVotes":0},
+    {"rank":21,"prevRank":21,"seoname":"saint-marys","nameShort":"Saint Mary's","conference":"WCC","wins":27,"losses":4,"points":325,"firstPlaceVotes":0},
+    {"rank":22,"prevRank":24,"seoname":"vanderbilt","nameShort":"Vanderbilt","conference":"SEC","wins":24,"losses":7,"points":323,"firstPlaceVotes":0},
+    {"rank":23,"prevRank":null,"seoname":"wisconsin","nameShort":"Wisconsin","conference":"Big Ten","wins":22,"losses":9,"points":201,"firstPlaceVotes":0},
+    {"rank":24,"prevRank":null,"seoname":"louisville","nameShort":"Louisville","conference":"ACC","wins":22,"losses":9,"points":140,"firstPlaceVotes":0},
+    {"rank":25,"prevRank":23,"seoname":"tennessee","nameShort":"Tennessee","conference":"SEC","wins":21,"losses":10,"points":72,"firstPlaceVotes":0}
+  ]
+}
