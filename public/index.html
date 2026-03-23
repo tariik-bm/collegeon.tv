@@ -162,6 +162,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f7;color:#1a1a1a;font-size:1
     <div class="live-badge" id="liveBadge" style="display:none"><div class="live-dot"></div><span id="liveCount">0</span> LIVE</div>
     <button class="nav-tab-btn" id="btnScores" onclick="showView('scores')" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer">📊 Scores</button>
     <button class="nav-tab-btn" id="btnRankings" onclick="showView('rankings')" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer">🏆 Rankings</button>
+    <button class="nav-tab-btn" id="btnBracket" onclick="showView('bracket')" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer">🗺️ Bracket</button>
     <button class="refresh-btn" id="refreshBtn" onclick="loadData()">
       <span class="spin">↻</span> Refresh
     </button>
@@ -235,6 +236,28 @@ body{font-family:'Inter',sans-serif;background:#f0f2f7;color:#1a1a1a;font-size:1
   </div>
 </div>
 
+<!-- BRACKET VIEW -->
+<div id="bracketView" style="display:none;height:calc(100vh - 96px);overflow:auto;background:#0a1628">
+  <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+    <div style="color:#fff;font-size:18px;font-weight:800">🗺️ March Madness 2026</div>
+    <div id="bracketUpdated" style="color:#aaa;font-size:11px"></div>
+  </div>
+  <!-- Round tabs -->
+  <div style="display:flex;gap:6px;padding:0 20px 12px;overflow-x:auto">
+    <button onclick="filterRound(0)"  id="rbtn-0"  class="rbtn active" style="padding:5px 12px;border-radius:20px;border:none;background:#1a3fa8;color:#fff;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">All</button>
+    <button onclick="filterRound(1)"  id="rbtn-1"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">First Four</button>
+    <button onclick="filterRound(2)"  id="rbtn-2"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">Round of 64</button>
+    <button onclick="filterRound(3)"  id="rbtn-3"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">Round of 32</button>
+    <button onclick="filterRound(4)"  id="rbtn-4"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">Sweet 16</button>
+    <button onclick="filterRound(5)"  id="rbtn-5"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">Elite 8</button>
+    <button onclick="filterRound(6)"  id="rbtn-6"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">Final Four</button>
+    <button onclick="filterRound(7)"  id="rbtn-7"  class="rbtn" style="padding:5px 12px;border-radius:20px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">Championship</button>
+  </div>
+  <div id="bracketGames" style="padding:0 20px 20px">
+    <div class="loading-state" style="color:#fff"><div class="loader"></div></div>
+  </div>
+</div>
+
 <script>
 const API = '/api';
 
@@ -252,16 +275,15 @@ function showView(view) {
   currentView = view;
   document.getElementById('scoresView').style.display    = view==='scores'   ? 'grid' : 'none';
   document.getElementById('rankingsView').style.display  = view==='rankings' ? 'block': 'none';
+  document.getElementById('bracketView').style.display   = view==='bracket'  ? 'block': 'none';
   const bs = document.getElementById('btnScores');
   const br = document.getElementById('btnRankings');
-  if (view==='scores') {
-    bs.style.background='rgba(255,255,255,0.15)'; bs.style.color='#fff'; bs.style.borderColor='rgba(255,255,255,0.3)';
-    br.style.background='transparent'; br.style.color='rgba(255,255,255,0.7)'; br.style.borderColor='rgba(255,255,255,0.2)';
-  } else {
-    br.style.background='rgba(255,255,255,0.15)'; br.style.color='#fff'; br.style.borderColor='rgba(255,255,255,0.3)';
-    bs.style.background='transparent'; bs.style.color='rgba(255,255,255,0.7)'; bs.style.borderColor='rgba(255,255,255,0.2)';
-    loadRankings();
-  }
+  const bb = document.getElementById('btnBracket');
+  [bs,br,bb].forEach(b => { if(b){ b.style.background='transparent'; b.style.color='rgba(255,255,255,0.7)'; b.style.borderColor='rgba(255,255,255,0.2)'; }});
+  const active = view==='scores'?bs : view==='rankings'?br : bb;
+  if(active){ active.style.background='rgba(255,255,255,0.15)'; active.style.color='#fff'; active.style.borderColor='rgba(255,255,255,0.3)'; }
+  if(view==='rankings') loadRankings();
+  if(view==='bracket')  loadBracket();
 }
 
 // ── Rankings ──────────────────────────────────────────────
@@ -1279,6 +1301,124 @@ setInterval(async () => {
     }
   } catch(e) {}
 }, 30000);
+
+// ── Bracket ───────────────────────────────────────────────
+let bracketData = [];
+let bracketRound = 0;
+
+const ROUND_NAMES = {1:'First Four',2:'Round of 64',3:'Round of 32',4:'Sweet 16',5:'Elite 8',6:'Final Four',7:'Championship'};
+const ROUND_COLORS = {1:'#6b7280',2:'#3b82f6',3:'#8b5cf6',4:'#f59e0b',5:'#ef4444',6:'#10b981',7:'#f97316'};
+
+const BROADCASTER_COLORS = {
+  'CBS':'#1e3a8a','ESPN':'#cc0000','ESPN2':'#cc0000','TNT':'#1a3fa8',
+  'TBS':'#0891b2','truTV':'#7c3aed','MAX':'#7c3aed',
+};
+
+async function loadBracket() {
+  document.getElementById('bracketGames').innerHTML = '<div class="loading-state" style="color:#fff"><div class="loader"></div></div>';
+  try {
+    const res  = await fetch(`${API}/mml/bracket`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    bracketData = json.contests || [];
+    document.getElementById('bracketUpdated').textContent = `${bracketData.length} games`;
+    renderBracket();
+  } catch(e) {
+    document.getElementById('bracketGames').innerHTML = `<div style="color:#ef4444;text-align:center;padding:40px">Error: ${e.message}</div>`;
+  }
+}
+
+function filterRound(n) {
+  bracketRound = n;
+  document.querySelectorAll('.rbtn').forEach(b => {
+    b.style.background = 'rgba(255,255,255,0.1)';
+    b.style.color = '#aaa';
+  });
+  const active = document.getElementById('rbtn-'+n);
+  if (active) { active.style.background='#1a3fa8'; active.style.color='#fff'; }
+  renderBracket();
+}
+
+function renderBracket() {
+  const games = bracketRound === 0
+    ? bracketData
+    : bracketData.filter(g => g.round?.roundNumber === bracketRound);
+
+  // Group by round
+  const byRound = {};
+  games.forEach(g => {
+    const rn = g.round?.roundNumber || 0;
+    if (!byRound[rn]) byRound[rn] = [];
+    byRound[rn].push(g);
+  });
+
+  let html = '';
+  Object.keys(byRound).sort((a,b)=>a-b).forEach(rn => {
+    const roundGames = byRound[rn];
+    const rname = ROUND_NAMES[rn] || roundGames[0]?.round?.title || `Round ${rn}`;
+    const rcolor = ROUND_COLORS[rn] || '#6b7280';
+    const subtitle = roundGames[0]?.round?.subtitle || '';
+
+    html += `<div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:4px;height:20px;background:${rcolor};border-radius:2px"></div>
+        <div style="font-size:14px;font-weight:800;color:#fff">${rname}</div>
+        ${subtitle?`<div style="font-size:11px;color:#6b7280">${subtitle}</div>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">`;
+
+    roundGames.forEach(g => {
+      const t1 = g.teams?.[0] || {};
+      const t2 = g.teams?.[1] || {};
+      const isLive = g.gameState === 'I';
+      const isFinal = g.gameState === 'F';
+      const isPre = g.gameState === 'P';
+      const bc = g.broadcaster?.name || '';
+      const bcColor = BROADCASTER_COLORS[bc] || '#374151';
+      const venue = g.location?.venue || '';
+
+      const teamRow = (t, opponent) => {
+        const isWinner = t.isWinner;
+        const scoreColor = isFinal ? (isWinner ? '#fff' : '#6b7280') : '#fff';
+        const nameBold = isFinal && isWinner ? '800' : '600';
+        return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;${isFinal&&isWinner?'background:rgba(255,255,255,0.05);border-radius:6px':''}">
+          <div style="width:20px;height:20px;border-radius:4px;background:#1e3a5f;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#9ca3af;flex-shrink:0">${t.seed||''}</div>
+          <img src="/api/logo/${t.seoname}" style="width:22px;height:22px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
+          <div style="flex:1;font-size:13px;font-weight:${nameBold};color:${scoreColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.nameShort||'TBD'}</div>
+          ${!isPre?`<div style="font-size:15px;font-weight:800;color:${scoreColor};min-width:28px;text-align:right">${t.score??''}</div>`:''}
+          ${isFinal&&isWinner?'<div style="font-size:10px;color:#10b981">✓</div>':''}
+        </div>`;
+      };
+
+      const dateStr = g.startDate ? new Date(g.startTimeEpoch*1000).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+
+      html += `<div style="background:#112240;border-radius:12px;border:1px solid ${isLive?'#ef4444':'rgba(255,255,255,0.08)'};overflow:hidden${isLive?';box-shadow:0 0 0 1px #ef4444':''}" >
+        <!-- header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div style="display:flex;align-items:center;gap:6px">
+            ${isLive?'<div style="width:6px;height:6px;border-radius:50%;background:#ef4444;animation:pulse 1s infinite"></div>':''}
+            <span style="font-size:10px;font-weight:700;color:${isLive?'#ef4444':isFinal?'#9ca3af':'#6b7280'}">${isLive?g.currentPeriod+' '+g.contestClock:isFinal?(g.currentPeriod||'FINAL'):(dateStr||'TBD')}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            ${venue?`<span style="font-size:9px;color:#6b7280">${venue}</span>`:''}
+            ${bc?`<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:${bcColor};color:#fff">${bc}</span>`:''}
+          </div>
+        </div>
+        <!-- teams -->
+        <div style="padding:4px 0">
+          ${teamRow(t1,t2)}
+          <div style="height:1px;background:rgba(255,255,255,0.05);margin:0 12px"></div>
+          ${teamRow(t2,t1)}
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  if (!html) html = '<div style="color:#6b7280;text-align:center;padding:40px">No games found</div>';
+  document.getElementById('bracketGames').innerHTML = html;
+}
 
 loadData();
 </script>

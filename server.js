@@ -15,12 +15,15 @@ const PORT      = 3000;
 const NCAA_HOST = 'sdataprod.ncaa.com';
 
 const HASHES = {
-  contests:  '6b26e5cda954c1302873c52835bfd223e169e2068b12511e92b3ef29fac779c2',
-  schedule:  '5f2dd33c4660d1d169b65a67b86bc578258b93cadc45c0ff871e372ea57a9825',
-  bracket:   '941f661183641391c58c4874929ffbf2edd5877baf783d585743c87c63959ace',
-  teamStats: '5fcf84602d59c003f37ddd1185da542578080e04fe854e935cbcaee590a0e8a2',
-  pbp:       '6b1232714a3598954c5bacabc0f81570e16d6ee017c9a6b93b601a3d40dafb98',
-  boxscore:  '4a7fa26398db33de3ff51402a90eb5f25acef001cca28d239fe5361315d1419a',
+  contests:      '6b26e5cda954c1302873c52835bfd223e169e2068b12511e92b3ef29fac779c2',
+  schedule:      '5f2dd33c4660d1d169b65a67b86bc578258b93cadc45c0ff871e372ea57a9825',
+  bracket:       '941f661183641391c58c4874929ffbf2edd5877baf783d585743c87c63959ace',
+  teamStats:     '5fcf84602d59c003f37ddd1185da542578080e04fe854e935cbcaee590a0e8a2',
+  pbp:           '6b1232714a3598954c5bacabc0f81570e16d6ee017c9a6b93b601a3d40dafb98',
+  boxscore:      '4a7fa26398db33de3ff51402a90eb5f25acef001cca28d239fe5361315d1419a',
+  mmlBracket:    'e5746c1f7317fbbb07928dee293eb92e7fa30cc349e5ed0c20e45fa94aacc22e',
+  mmlCurrent:    'e87c0a32428997f6b576a015810811b20038933a3b2f70cbf3b8aad2817183d8',
+  mmlOfficial:   '58cd1e8be6f2902dd6d7fed23392b885c7349ea6ff04b740f95cfe8f8c226595',
 };
 
 // ─── Scrape NCAA Rankings ─────────────────────────────────
@@ -500,6 +503,26 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true, data: data?.data || {} });
     } catch(e) {
       console.error('[/api/bracket]', e.message);
+      return sendJSON(res, 500, { ok: false, error: e.message });
+    }
+  }
+
+  // /api/mml/bracket — full March Madness bracket with scores
+  if (pathname === '/api/mml/bracket') {
+    try {
+      const data = await ncaaFetch('scores_bracket_web', HASHES.mmlBracket, { seasonYear: 2025 });
+      return sendJSON(res, 200, { ok: true, contests: data?.data?.mmlContests || [] });
+    } catch(e) {
+      return sendJSON(res, 500, { ok: false, error: e.message });
+    }
+  }
+
+  // /api/mml/live — current live March Madness games
+  if (pathname === '/api/mml/live') {
+    try {
+      const data = await ncaaFetch('scores_current_web', HASHES.mmlCurrent, { seasonYear: 2025, current: true });
+      return sendJSON(res, 200, { ok: true, contests: data?.data?.mmlContests || [], events: data?.data?.mmlEvents || [] });
+    } catch(e) {
       return sendJSON(res, 500, { ok: false, error: e.message });
     }
   }
