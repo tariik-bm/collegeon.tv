@@ -1,0 +1,235 @@
+{
+  "poll": "AP Top 25",
+  "updated": "2026-03-16",
+  "season": "2025-26",
+  "hasPoints": false,
+  "hasChange": false,
+  "extraCol": null,
+  "rankings": [
+    {
+      "rank": 1,
+      "seoname": "duke",
+      "nameShort": "Duke",
+      "espnId": "150",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/150.png",
+      "wins": 32,
+      "losses": 2
+    },
+    {
+      "rank": 2,
+      "seoname": "arizona",
+      "nameShort": "Arizona",
+      "espnId": "12",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/12.png",
+      "wins": 32,
+      "losses": 2
+    },
+    {
+      "rank": 3,
+      "seoname": "michigan",
+      "nameShort": "Michigan",
+      "espnId": "130",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/130.png",
+      "wins": 31,
+      "losses": 3
+    },
+    {
+      "rank": 4,
+      "seoname": "florida",
+      "nameShort": "Florida",
+      "espnId": "57",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/57.png",
+      "wins": 26,
+      "losses": 7
+    },
+    {
+      "rank": 5,
+      "seoname": "houston",
+      "nameShort": "Houston",
+      "espnId": "248",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/248.png",
+      "wins": 28,
+      "losses": 6
+    },
+    {
+      "rank": 6,
+      "seoname": "iowa-st",
+      "nameShort": "Iowa State",
+      "espnId": "66",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/66.png",
+      "wins": 27,
+      "losses": 7
+    },
+    {
+      "rank": 7,
+      "seoname": "uconn",
+      "nameShort": "UConn",
+      "espnId": "41",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/41.png",
+      "wins": 29,
+      "losses": 5
+    },
+    {
+      "rank": 8,
+      "seoname": "purdue",
+      "nameShort": "Purdue",
+      "espnId": "2509",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2509.png",
+      "wins": 27,
+      "losses": 8
+    },
+    {
+      "rank": 9,
+      "seoname": "virginia",
+      "nameShort": "Virginia",
+      "espnId": "258",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/258.png",
+      "wins": 29,
+      "losses": 5
+    },
+    {
+      "rank": 10,
+      "seoname": "st-johns",
+      "nameShort": "St John's",
+      "espnId": "2599",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2599.png",
+      "wins": 28,
+      "losses": 6
+    },
+    {
+      "rank": 11,
+      "seoname": "michigan-st",
+      "nameShort": "Michigan St",
+      "espnId": "127",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/127.png",
+      "wins": 25,
+      "losses": 7
+    },
+    {
+      "rank": 12,
+      "seoname": "gonzaga",
+      "nameShort": "Gonzaga",
+      "espnId": "2250",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2250.png",
+      "wins": 30,
+      "losses": 3
+    },
+    {
+      "rank": 13,
+      "seoname": "illinois",
+      "nameShort": "Illinois",
+      "espnId": "356",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/356.png",
+      "wins": 24,
+      "losses": 8
+    },
+    {
+      "rank": 14,
+      "seoname": "arkansas",
+      "nameShort": "Arkansas",
+      "espnId": "8",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/8.png",
+      "wins": 26,
+      "losses": 8
+    },
+    {
+      "rank": 15,
+      "seoname": "nebraska",
+      "nameShort": "Nebraska",
+      "espnId": "158",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/158.png",
+      "wins": 26,
+      "losses": 6
+    },
+    {
+      "rank": 16,
+      "seoname": "vanderbilt",
+      "nameShort": "Vanderbilt",
+      "espnId": "238",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/238.png",
+      "wins": 26,
+      "losses": 8
+    },
+    {
+      "rank": 17,
+      "seoname": "kansas",
+      "nameShort": "Kansas",
+      "espnId": "2305",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2305.png",
+      "wins": 23,
+      "losses": 10
+    },
+    {
+      "rank": 18,
+      "seoname": "alabama",
+      "nameShort": "Alabama",
+      "espnId": "333",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/333.png",
+      "wins": 23,
+      "losses": 9
+    },
+    {
+      "rank": 19,
+      "seoname": "wisconsin",
+      "nameShort": "Wisconsin",
+      "espnId": "275",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/275.png",
+      "wins": 24,
+      "losses": 10
+    },
+    {
+      "rank": 20,
+      "seoname": "texas-tech",
+      "nameShort": "Texas Tech",
+      "espnId": "2641",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png",
+      "wins": 22,
+      "losses": 10
+    },
+    {
+      "rank": 21,
+      "seoname": "north-carolina",
+      "nameShort": "North Carolina",
+      "espnId": "153",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/153.png",
+      "wins": 24,
+      "losses": 8
+    },
+    {
+      "rank": 22,
+      "seoname": "saint-marys",
+      "nameShort": "Saint Mary's",
+      "espnId": "2608",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2608.png",
+      "wins": 27,
+      "losses": 5
+    },
+    {
+      "rank": 23,
+      "seoname": "tennessee",
+      "nameShort": "Tennessee",
+      "espnId": "2633",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2633.png",
+      "wins": 22,
+      "losses": 11
+    },
+    {
+      "rank": 23,
+      "seoname": "louisville",
+      "nameShort": "Louisville",
+      "espnId": "97",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/97.png",
+      "wins": 23,
+      "losses": 10
+    },
+    {
+      "rank": 25,
+      "seoname": "miami-fl",
+      "nameShort": "Miami",
+      "espnId": "2390",
+      "espnLogo": "https://a.espncdn.com/i/teamlogos/ncaa/500/2390.png",
+      "wins": 25,
+      "losses": 8
+    }
+  ]
+}

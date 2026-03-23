@@ -1,0 +1,26 @@
+{
+  "poll": "Top 16 Committee Ranking",
+  "updated": "2026-02-20",
+  "season": "2025-26",
+  "hasPoints": false,
+  "hasChange": false,
+  "extraCol": null,
+  "rankings": [
+    {"rank":1,"seoname":"michigan","nameShort":"Michigan","conference":"Big Ten","wins":0,"losses":0},
+    {"rank":2,"seoname":"duke","nameShort":"Duke","conference":"ACC","wins":0,"losses":0},
+    {"rank":3,"seoname":"arizona","nameShort":"Arizona","conference":"Big 12","wins":0,"losses":0},
+    {"rank":4,"seoname":"iowa-st","nameShort":"Iowa St.","conference":"Big 12","wins":0,"losses":0},
+    {"rank":5,"seoname":"uconn","nameShort":"UConn","conference":"Big East","wins":0,"losses":0},
+    {"rank":6,"seoname":"houston","nameShort":"Houston","conference":"Big 12","wins":0,"losses":0},
+    {"rank":7,"seoname":"illinois","nameShort":"Illinois","conference":"Big Ten","wins":0,"losses":0},
+    {"rank":8,"seoname":"purdue","nameShort":"Purdue","conference":"Big Ten","wins":0,"losses":0},
+    {"rank":9,"seoname":"florida","nameShort":"Florida","conference":"SEC","wins":0,"losses":0},
+    {"rank":10,"seoname":"kansas","nameShort":"Kansas","conference":"Big 12","wins":0,"losses":0},
+    {"rank":11,"seoname":"nebraska","nameShort":"Nebraska","conference":"Big Ten","wins":0,"losses":0},
+    {"rank":12,"seoname":"gonzaga","nameShort":"Gonzaga","conference":"WCC","wins":0,"losses":0},
+    {"rank":13,"seoname":"texas-tech","nameShort":"Texas Tech","conference":"Big 12","wins":0,"losses":0},
+    {"rank":14,"seoname":"michigan-st","nameShort":"Michigan St.","conference":"Big Ten","wins":0,"losses":0},
+    {"rank":15,"seoname":"vanderbilt","nameShort":"Vanderbilt","conference":"SEC","wins":0,"losses":0},
+    {"rank":16,"seoname":"virginia","nameShort":"Virginia","conference":"ACC","wins":0,"losses":0}
+  ]
+}

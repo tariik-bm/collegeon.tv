@@ -325,7 +325,7 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/rankings') {
     const poll = query.poll || 'ap';
     if (!POLL_CONFIG[poll]) return sendJSON(res, 400, { ok: false, error: 'Unknown poll' });
-    const cfg  = POLL_CONFIG[pollKey] || POLL_CONFIG[poll];
+    const cfg  = POLL_CONFIG[poll];
     const file = path.join(__dirname, 'data', `rankings-${poll}.json`);
 
     // Check cache age
