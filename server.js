@@ -885,8 +885,29 @@ const server = http.createServer(async (req, res) => {
         '401025839':229, '401025835':230, '401025837':231, '401025824':232,
       };
 
-      // Transform to our contest format with bracketId assignment
-      // Group by round, then assign bracketIds matching our layout
+      // ESPN pre-2016 used different round naming:
+      // "First Round" = First Four (4 games)
+      // "Second Round" = 64-team round (our "First Round")
+      // "Sweet 16" etc. shifted accordingly
+      // Fix: remap round titles for years before 2016
+      if(year < 2016) {
+        events.forEach(ev => {
+          const comp = ev.competitions?.[0];
+          if(!comp) return;
+          const note = comp.notes?.[0]?.headline || '';
+          const nu = note.toUpperCase();
+          // Remap based on roundNumber from ESPN
+          const rn = comp.status?.type?.description || '';
+          // Use the event's round number to remap
+          ev.__remappedRound = null;
+          if(nu.includes('FIRST ROUND') || nu.includes('1ST ROUND')) ev.__remappedRound = 'First Four';
+          else if(nu.includes('SECOND ROUND') || nu.includes('2ND ROUND')) ev.__remappedRound = 'First Round';
+          else if(nu.includes('SWEET 16') || nu.includes('REGIONAL SEMIFINAL')) ev.__remappedRound = 'Sweet 16';
+          else if(nu.includes('REGIONAL') && (nu.includes('FINAL') || nu.includes('CHAMPIONSHIP') || nu.includes('ELITE'))) ev.__remappedRound = 'Elite Eight';
+          else if(nu.includes('NATIONAL SEMIFINAL') || nu.includes('FINAL FOUR')) ev.__remappedRound = 'Final Four';
+          else if(nu.includes('NATIONAL CHAMPIONSHIP') || nu.includes('CHAMPIONSHIP GAME')) ev.__remappedRound = 'Championship';
+        });
+      }
       const roundOrder = {'First Four':0,'First Round':1,'Second Round':2,'Sweet 16':3,'Sweet Sixteen':3,'Elite Eight':4,'Final Four':5,'Championship':6};
       const roundBase  = [201, 201, 301, 401, 501, 601, 701]; // bracketId bases per round
 
@@ -1036,7 +1057,7 @@ const server = http.createServer(async (req, res) => {
         const status = comp?.status;
         const gameState = status?.type?.state === 'post' ? 'F' : status?.type?.state === 'in' ? 'I' : 'P';
         const note = comp?.notes?.[0]?.headline || '';
-        const roundKey = getRoundFromNote(note);
+        const roundKey = ev.__remappedRound || getRoundFromNote(note);
         const ri = roundOrder[roundKey] ?? 1;
         const bracketId = assignBracketId(roundKey, ev);
 
@@ -1071,22 +1092,25 @@ const server = http.createServer(async (req, res) => {
         });
       });
 
-      // Fix duplicate bracketIds for ALL rounds
+      // Fix duplicate bracketIds - fill gaps by searching forward from original ID
       const usedBracketIds = new Set();
       contests.forEach(c => {
         if(usedBracketIds.has(c.bracketId)) {
           const rk = c.round?.title;
-          let base, max;
-          if(rk === 'First Round')   { base = 201; max = 232; }
-          else if(rk === 'Second Round') { base = 301; max = 316; }
-          else if(rk === 'Sweet 16' || rk === 'Sweet Sixteen') { base = 401; max = 408; }
-          else if(rk === 'Elite Eight') { base = 501; max = 504; }
+          let min, max;
+          if(rk === 'First Round')   { min = 201; max = 232; }
+          else if(rk === 'Second Round') { min = 301; max = 332; }
+          else if(rk === 'Sweet 16' || rk === 'Sweet Sixteen') { min = 401; max = 416; }
+          else if(rk === 'Elite Eight') { min = 501; max = 508; }
           else { usedBracketIds.add(c.bracketId); return; }
-          
-          // Find next available slot
+          // Search forward from current bracketId
           let newId = c.bracketId + 1;
-          while(usedBracketIds.has(newId) && newId <= max) newId++;
-          if(newId <= max) c.bracketId = newId;
+          if(newId > max) newId = min; // wrap around
+          while(usedBracketIds.has(newId) && newId !== c.bracketId) {
+            newId++;
+            if(newId > max) newId = min;
+          }
+          if(!usedBracketIds.has(newId)) c.bracketId = newId;
         }
         usedBracketIds.add(c.bracketId);
       });
