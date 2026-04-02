@@ -806,6 +806,22 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/espn/bracket') {
     try {
       const year = parseInt(query.year || '2019');
+      
+      // Check cache first
+      const cacheDir = path.join(__dirname, 'cache');
+      const cacheFile = path.join(cacheDir, `espn_bracket_${year}.json`);
+      
+      // Create cache dir if needed
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+      
+      // Return cached data if exists
+      if (fs.existsSync(cacheFile)) {
+        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+        console.log(`[ESPN Bracket] Serving ${year} from cache (${cached.contests?.length} contests)`);
+        return sendJSON(res, 200, cached);
+      }
+      
+      console.log(`[ESPN Bracket] Fetching ${year} from ESPN...`);
       const MM_ROUNDS = ['First Four','First Round','Second Round','Sweet 16','Sweet Sixteen','Elite Eight','Final Four','Championship'];
       // Older ESPN format (pre-2019): "MEN'S BASKETBALL CHAMPIONSHIP - EAST REGION - 1st ROUND"
       function isMMGame(ev) {
@@ -871,41 +887,53 @@ const server = http.createServer(async (req, res) => {
       // Hardcoded contestId → bracketId for ESPN historical First Round
       // Built from actual ESPN API data - each region has 8 slots
       const hardcodedBracketIds = {
-        // 2018 First Round - East (201-208): Villanova region
-        '401025816':201, '401025833':202, '401025832':203, '401025819':204,
-        '401025828':205, '401025822':206, '401025827':207, '401025821':208,
-        // 2018 First Round - West (209-216): Gonzaga/Duke region
-        '401025825':209, '401025840':210, '401025836':211, '401025834':212,
-        '401025853':213, '401025829':214, '401025838':215, '401025821':216,
-        // 2018 First Round - South (217-224): Cincinnati/Xavier region
-        '401025831':217, '401025850':218, '401025814':219, '401025818':220,
-        '401025826':221, '401025817':222, '401025830':223, '401025813':224,
-        // 2018 First Round - Midwest (225-232): Kansas region
-        '401025823':225, '401025815':226, '401025852':227, '401025820':228,
-        '401025839':229, '401025835':230, '401025837':231, '401025824':232,
+        // 2018 First Round
+        '401025816':201,'401025833':202,'401025832':203,'401025819':204,
+        '401025828':205,'401025822':206,'401025827':207,'401025821':208,
+        '401025825':209,'401025840':210,'401025836':211,'401025834':212,
+        '401025853':213,'401025829':214,'401025838':215,'401025821':216,
+        '401025831':217,'401025850':218,'401025814':219,'401025818':220,
+        '401025826':221,'401025817':222,'401025830':223,'401025813':224,
+        '401025823':225,'401025815':226,'401025852':227,'401025820':228,
+        '401025839':229,'401025835':230,'401025837':231,'401025824':232,
+        // 2015 Second Round (ESPN calls them Sweet 16, bracketIds 401-408 → we map to 301-316)
+        '400786505':301,'400786512':302,'400786516':303,'400786506':304,
+        '400786514':309,'400786370':310,'400786510':311,'400786476':312,
+        // 2015 Sweet 16 (ESPN calls them Elite Eight, bracketIds 501-504 → we map to 401-408)
+        '400786516':401,'400786506':402,'400786505':403,'400786512':404,
+        '400786514':405,'400786370':406,'400786510':407,'400786476':408,
       };
 
-      // ESPN pre-2016 used different round naming:
-      // "First Round" = First Four (4 games)
-      // "Second Round" = 64-team round (our "First Round")
-      // "Sweet 16" etc. shifted accordingly
-      // Fix: remap round titles for years before 2016
+      // ESPN pre-2016 used different round naming AND bracketIds shifted by one round:
+      // ESPN "First Round" = our First Four
+      // ESPN "Second Round" (bracketIds 201-232) = our First Round
+      // ESPN "Sweet 16" (bracketIds 401-408) = our Second Round (301-316)
+      // ESPN "Elite Eight" (bracketIds 501-504) = our Sweet 16 (401-408)
       if(year < 2016) {
         events.forEach(ev => {
           const comp = ev.competitions?.[0];
           if(!comp) return;
           const note = comp.notes?.[0]?.headline || '';
           const nu = note.toUpperCase();
-          // Remap based on roundNumber from ESPN
-          const rn = comp.status?.type?.description || '';
-          // Use the event's round number to remap
           ev.__remappedRound = null;
-          if(nu.includes('FIRST ROUND') || nu.includes('1ST ROUND')) ev.__remappedRound = 'First Four';
-          else if(nu.includes('SECOND ROUND') || nu.includes('2ND ROUND')) ev.__remappedRound = 'First Round';
-          else if(nu.includes('SWEET 16') || nu.includes('REGIONAL SEMIFINAL')) ev.__remappedRound = 'Sweet 16';
-          else if(nu.includes('REGIONAL') && (nu.includes('FINAL') || nu.includes('CHAMPIONSHIP') || nu.includes('ELITE'))) ev.__remappedRound = 'Elite Eight';
-          else if(nu.includes('NATIONAL SEMIFINAL') || nu.includes('FINAL FOUR')) ev.__remappedRound = 'Final Four';
-          else if(nu.includes('NATIONAL CHAMPIONSHIP') || nu.includes('CHAMPIONSHIP GAME')) ev.__remappedRound = 'Championship';
+          ev.__bracketIdOffset = 0;
+          if(nu.includes('FIRST ROUND') || nu.includes('1ST ROUND')) {
+            ev.__remappedRound = 'First Four';
+          } else if(nu.includes('SECOND ROUND') || nu.includes('2ND ROUND')) {
+            ev.__remappedRound = 'First Round';
+          } else if(nu.includes('SWEET 16') || nu.includes('REGIONAL SEMIFINAL')) {
+            ev.__remappedRound = 'Second Round';
+            ev.__bracketIdOffset = -100; // 401→301, 402→302, etc.
+            ev.__espnBracketId = ev.competitions?.[0]?.bracketId;
+          } else if(nu.includes('REGIONAL') && (nu.includes('FINAL') || nu.includes('CHAMPIONSHIP') || nu.includes('ELITE'))) {
+            ev.__remappedRound = 'Sweet 16';
+            ev.__bracketIdOffset = -100; // 501→401, 502→402, etc.
+            ev.__espnBracketId = ev.competitions?.[0]?.bracketId;
+          } else if(nu.includes('NATIONAL SEMIFINAL') || nu.includes('FINAL FOUR')) {
+            ev.__remappedRound = 'Final Four';
+          } else if(nu.includes('NATIONAL CHAMPIONSHIP') || nu.includes('CHAMPIONSHIP GAME')) {
+            ev.__remappedRound = 'Championship';
+          }
         });
       }
       const roundOrder = {'First Four':0,'First Round':1,'Second Round':2,'Sweet 16':3,'Sweet Sixteen':3,'Elite Eight':4,'Final Four':5,'Championship':6};
@@ -1059,7 +1087,8 @@ const server = http.createServer(async (req, res) => {
         const note = comp?.notes?.[0]?.headline || '';
         const roundKey = ev.__remappedRound || getRoundFromNote(note);
         const ri = roundOrder[roundKey] ?? 1;
-        const bracketId = assignBracketId(roundKey, ev);
+        // Use hardcoded bracketId if available
+        let bracketId = hardcodedBracketIds[ev.id] || assignBracketId(roundKey, ev);
 
         contests.push({
           bracketId,
@@ -1092,7 +1121,7 @@ const server = http.createServer(async (req, res) => {
         });
       });
 
-      // Fix duplicate bracketIds - fill gaps by searching forward from original ID
+      // Fix duplicate bracketIds - simple forward search with max iterations
       const usedBracketIds = new Set();
       contests.forEach(c => {
         if(usedBracketIds.has(c.bracketId)) {
@@ -1103,19 +1132,30 @@ const server = http.createServer(async (req, res) => {
           else if(rk === 'Sweet 16' || rk === 'Sweet Sixteen') { min = 401; max = 416; }
           else if(rk === 'Elite Eight') { min = 501; max = 508; }
           else { usedBracketIds.add(c.bracketId); return; }
-          // Search forward from current bracketId
+          // Find next available slot
           let newId = c.bracketId + 1;
-          if(newId > max) newId = min; // wrap around
-          while(usedBracketIds.has(newId) && newId !== c.bracketId) {
+          let attempts = 0;
+          while(usedBracketIds.has(newId) && attempts < 50) {
             newId++;
             if(newId > max) newId = min;
+            attempts++;
           }
           if(!usedBracketIds.has(newId)) c.bracketId = newId;
         }
         usedBracketIds.add(c.bracketId);
       });
 
-      return sendJSON(res, 200, { ok: true, contests, year, total: contests.length, source: 'ESPN' });
+      const result = { ok: true, contests, year, total: contests.length, source: 'ESPN' };
+      
+      // Save to cache
+      try {
+        fs.writeFileSync(cacheFile, JSON.stringify(result));
+        console.log(`[ESPN Bracket] Cached ${year} (${contests.length} contests)`);
+      } catch(cacheErr) {
+        console.warn('[ESPN Bracket] Cache write failed:', cacheErr.message);
+      }
+      
+      return sendJSON(res, 200, result);
     } catch(e) {
       return sendJSON(res, 500, { ok: false, error: e.message });
     }
