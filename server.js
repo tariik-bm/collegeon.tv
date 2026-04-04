@@ -806,21 +806,6 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/espn/bracket') {
     try {
       const year = parseInt(query.year || '2019');
-      
-      // Check cache first
-      const cacheDir = path.join(__dirname, 'cache');
-      const cacheFile = path.join(cacheDir, `espn_bracket_${year}.json`);
-      
-      // Create cache dir if needed
-      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-      
-      // Return cached data if exists
-      if (fs.existsSync(cacheFile)) {
-        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
-        console.log(`[ESPN Bracket] Serving ${year} from cache (${cached.contests?.length} contests)`);
-        return sendJSON(res, 200, cached);
-      }
-      
       console.log(`[ESPN Bracket] Fetching ${year} from ESPN...`);
       const MM_ROUNDS = ['First Four','First Round','Second Round','Sweet 16','Sweet Sixteen','Elite Eight','Final Four','Championship'];
       // Older ESPN format (pre-2019): "MEN'S BASKETBALL CHAMPIONSHIP - EAST REGION - 1st ROUND"
@@ -1146,15 +1131,6 @@ const server = http.createServer(async (req, res) => {
       });
 
       const result = { ok: true, contests, year, total: contests.length, source: 'ESPN' };
-      
-      // Save to cache
-      try {
-        fs.writeFileSync(cacheFile, JSON.stringify(result));
-        console.log(`[ESPN Bracket] Cached ${year} (${contests.length} contests)`);
-      } catch(cacheErr) {
-        console.warn('[ESPN Bracket] Cache write failed:', cacheErr.message);
-      }
-      
       return sendJSON(res, 200, result);
     } catch(e) {
       return sendJSON(res, 500, { ok: false, error: e.message });
@@ -1166,26 +1142,8 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/mml/bracket') {
     try {
       const season = parseInt(query.season || '2025') || 2025;
-      
-      // Check cache
-      const cacheDir = path.join(__dirname, 'cache');
-      const cacheFile = path.join(cacheDir, `ncaa_bracket_${season}.json`);
-      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-      
-      if (fs.existsSync(cacheFile)) {
-        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
-        // For current season (2025), only use cache if less than 1 hour old
-        const age = Date.now() - (cached.__cachedAt || 0);
-        if (season < 2025 || age < 3600000) {
-          return sendJSON(res, 200, cached);
-        }
-      }
-      
       const data = await ncaaFetch('scores_bracket_web', HASHES.mmlBracket, { seasonYear: season });
-      const result = { ok: true, contests: data?.data?.mmlContests || [], season, __cachedAt: Date.now() };
-      
-      try { fs.writeFileSync(cacheFile, JSON.stringify(result)); } catch(e) {}
-      return sendJSON(res, 200, result);
+      return sendJSON(res, 200, { ok: true, contests: data?.data?.mmlContests || [], season });
     } catch(e) {
       return sendJSON(res, 500, { ok: false, error: e.message });
     }
