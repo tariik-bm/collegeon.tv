@@ -260,7 +260,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f7;color:#1a1a1a;font-size:1
         <option value="ncaa:2023">2024 — UConn 🏆</option>
         <option value="ncaa:2022">2023 — UConn 🏆</option>
         <option value="ncaa:2021">2022 — Kansas 🏆</option>
-        <option value="espn:2019">2019 — Virginia 🏆</option>
+        <option value="espn:2019" selected>2019 — Virginia 🏆</option>
         <option value="espn:2018">2018 — Villanova 🏆</option>
         <option value="espn:2017">2017 — North Carolina 🏆</option>
         <option value="espn:2016">2016 — Villanova 🏆</option>
@@ -2281,15 +2281,61 @@ async function loadBracket(forceReload){
       if(!j.ok) throw new Error(j.error || 'ESPN bracket not available');
       if(!j.contests || j.contests.length === 0) throw new Error('No tournament data found for this year');
 
-      // For ESPN historical brackets, store by contestId (bracketIds may not be reliable)
-      // and render using a special ESPN bracket layout
+      // For ESPN historical brackets: fix duplicate bracketIds
+      // ESPN sometimes assigns same bracketId to different games
+      // Solution: deduplicate by assigning overflow games to empty slots
       bracketData = {};
+      const usedSlots = new Set();
+      
+      // First pass: assign non-duplicate bracketIds
       j.contests.forEach(g => {
-        // Use contestId as primary key, also index by bracketId (may have duplicates)
-        bracketData[g.bracketId] = g; // last-write-wins for duplicates
-        bracketData[`espn_${g.contestId}`] = g; // also store by contestId
+        bracketData[`espn_${g.contestId}`] = g;
       });
-      // Store all contests for ESPN rendering
+
+      // Second pass: assign bracketIds, handling duplicates
+      // Build list of all valid slots per round
+      const allSlots = [
+        ...Array.from({length:4},(_,i)=>101+i),      // First Four: 101-104
+        ...Array.from({length:8},(_,i)=>201+i),      // East R64: 201-208
+        ...Array.from({length:8},(_,i)=>209+i),      // West R64: 209-216
+        ...Array.from({length:8},(_,i)=>217+i),      // South R64: 217-224
+        ...Array.from({length:8},(_,i)=>225+i),      // Midwest R64: 225-232
+        ...Array.from({length:4},(_,i)=>301+i),      // East R32: 301-304
+        ...Array.from({length:4},(_,i)=>305+i),      // West R32: 305-308
+        ...Array.from({length:4},(_,i)=>309+i),      // South R32: 309-312
+        ...Array.from({length:4},(_,i)=>313+i),      // Midwest R32: 313-316
+        401,402,403,404,405,406,407,408,             // Sweet 16
+        501,502,503,504,                              // Elite Eight
+        601,602,701                                   // FF + Champ
+      ];
+      const availableSlots = [...allSlots];
+
+      j.contests.forEach(g => {
+        if(!usedSlots.has(g.bracketId)) {
+          bracketData[g.bracketId] = g;
+          usedSlots.add(g.bracketId);
+        } else {
+          // Find next available slot in same round range
+          const bid = g.bracketId;
+          let rangeStart, rangeEnd;
+          if(bid>=101&&bid<=104){rangeStart=101;rangeEnd=104;}
+          else if(bid>=201&&bid<=232){rangeStart=201;rangeEnd=232;}
+          else if(bid>=301&&bid<=316){rangeStart=301;rangeEnd=316;}
+          else if(bid>=401&&bid<=408){rangeStart=401;rangeEnd=408;}
+          else if(bid>=501&&bid<=504){rangeStart=501;rangeEnd=504;}
+          else{rangeStart=bid;rangeEnd=bid;}
+          
+          let newSlot = null;
+          for(let s=rangeStart;s<=rangeEnd;s++){
+            if(!usedSlots.has(s)){newSlot=s;break;}
+          }
+          if(newSlot){
+            bracketData[newSlot]=g;
+            usedSlots.add(newSlot);
+          }
+        }
+      });
+
       bracketData.__espnContests = j.contests;
       bracketData.__espnSource = true;
 

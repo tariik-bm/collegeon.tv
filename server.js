@@ -1166,8 +1166,26 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/mml/bracket') {
     try {
       const season = parseInt(query.season || '2025') || 2025;
+      
+      // Check cache
+      const cacheDir = path.join(__dirname, 'cache');
+      const cacheFile = path.join(cacheDir, `ncaa_bracket_${season}.json`);
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+      
+      if (fs.existsSync(cacheFile)) {
+        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+        // For current season (2025), only use cache if less than 1 hour old
+        const age = Date.now() - (cached.__cachedAt || 0);
+        if (season < 2025 || age < 3600000) {
+          return sendJSON(res, 200, cached);
+        }
+      }
+      
       const data = await ncaaFetch('scores_bracket_web', HASHES.mmlBracket, { seasonYear: season });
-      return sendJSON(res, 200, { ok: true, contests: data?.data?.mmlContests || [], season });
+      const result = { ok: true, contests: data?.data?.mmlContests || [], season, __cachedAt: Date.now() };
+      
+      try { fs.writeFileSync(cacheFile, JSON.stringify(result)); } catch(e) {}
+      return sendJSON(res, 200, result);
     } catch(e) {
       return sendJSON(res, 500, { ok: false, error: e.message });
     }
