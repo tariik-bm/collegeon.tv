@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:site.api.espn.com)",
+      "WebFetch(domain:sports.core.api.espn.com)",
+      "Bash(curl -s \"https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=20150319&groups=50&limit=100\")",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); events=data.get\\('events',[]\\); print\\(f'Total events: {len\\(events\\)}'\\); [print\\(f'  {e[\\\\\"id\\\\\"]} | {e[\\\\\"name\\\\\"]} | {e.get\\(\\\\\"date\\\\\",\\\\\"\\\\\"\\)} | notes: {e[\\\\\"competitions\\\\\"][0].get\\(\\\\\"notes\\\\\",[]\\)}'\\) for e in events[:5]]\")",
+      "WebFetch(domain:site.web.api.espn.com)",
+      "Bash(node:*)",
+      "Bash(curl -s \"http://localhost:3000/api/espn/bracket?year=2015\")",
+      "Bash(python3 -c ':*)",
+      "Bash(curl -s 'http://localhost:3000/api/espn/bracket?year=__TRACKED_VAR__')",
+      "Bash(curl -s \"http://localhost:3000/api/espn/bracket?year=2016\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /PID 27952 /F)",
+      "Bash(cmd /c \"taskkill /PID 27952 /F\")",
+      "Bash(cmd /c \"taskkill /F /PID 27952\")",
+      "Bash(curl -s http://localhost:3000/api/espn/bracket?year=2016)",
+      "Bash(cmd /c \"taskkill /F /IM node.exe\")",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)",
+      "WebSearch",
+      "WebFetch(domain:en.wikipedia.org)"
+    ]
+  }
+}
