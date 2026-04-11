@@ -2543,7 +2543,8 @@ const ROUNDS=[
 function bCard(id,w,top,champ){
   const g=bracketData[id];
   const fin=g?.gameState==='F', live=g?.gameState==='I', pre=!g||g?.gameState==='P';
-  const t1=g?.teams?.[0], t2=g?.teams?.[1];
+  let [t1,t2]=[g?.teams?.[0], g?.teams?.[1]];
+  if(t1?.seed && t2?.seed && Number(t1.seed) > Number(t2.seed))[t1,t2]=[t2,t1];
   const bc=g?.broadcaster?.name||'', bcb=BC_BG[bc]||'';
   const h=champ?CH+16:CH;
   const rh=Math.floor((h-16)/2);
@@ -2584,15 +2585,18 @@ function bCard(id,w,top,champ){
 
 function buildSVG(srcCY,dstCY,H,flip){
   const W=CONN; let p='';
-  for(let i=0;i<dstCY.length;i++){
-    const y1=srcCY[i*2],y2=srcCY[i*2+1],yd=dstCY[i];
-    const stroke='rgba(255,255,255,0.2)';
-    if(!flip){
+  const stroke='rgba(255,255,255,0.2)';
+  if(!flip){
+    for(let i=0;i<dstCY.length;i++){
+      const y1=srcCY[i*2],y2=srcCY[i*2+1],yd=dstCY[i];
       p+=`<path d="M0,${y1} H${W/2} V${y2} H0" fill="none" stroke="${stroke}" stroke-width="1.5"/>`;
       p+=`<line x1="${W/2}" y1="${yd}" x2="${W}" y2="${yd}" stroke="${stroke}" stroke-width="1.5"/>`;
-    }else{
-      p+=`<path d="M${W},${y1} H${W/2} V${y2} H${W}" fill="none" stroke="${stroke}" stroke-width="1.5"/>`;
-      p+=`<line x1="${W/2}" y1="${yd}" x2="0" y2="${yd}" stroke="${stroke}" stroke-width="1.5"/>`;
+    }
+  }else{
+    for(let i=0;i<srcCY.length;i++){
+      const ys=srcCY[i],dy1=dstCY[i*2],dy2=dstCY[i*2+1];
+      p+=`<line x1="0" y1="${ys}" x2="${W/2}" y2="${ys}" stroke="${stroke}" stroke-width="1.5"/>`;
+      p+=`<path d="M${W},${dy1} H${W/2} V${dy2} H${W}" fill="none" stroke="${stroke}" stroke-width="1.5"/>`;
     }
   }
   return `<div style="width:${W}px;height:${H}px;flex-shrink:0"><svg width="${W}" height="${H}">${p}</svg></div>`;
@@ -2627,7 +2631,7 @@ function bRegion(color,name,r64ids,r32ids,s16ids,e8id,flip){
   const cr3=`<div style="flex-shrink:0;width:${CW[0]}px">${mkHdr(0)}<div style="position:relative;height:${TOTAL_H}px">${r64ids.map((id,i)=>bCard(id,CW[0],R64_T[i])).join('')}</div></div>`;
 
   const cols=flip
-    ?[cr0,msv(buildSVG(S16_CY,[E8_CY],TOTAL_H,flip)),cr1,msv(buildSVG(R32_CY,S16_CY,TOTAL_H,flip)),cr2,msv(buildSVG(R64_CY,R32_CY,TOTAL_H,flip)),cr3]
+    ?[cr0,msv(buildSVG([E8_CY],S16_CY,TOTAL_H,flip)),cr1,msv(buildSVG(S16_CY,R32_CY,TOTAL_H,flip)),cr2,msv(buildSVG(R32_CY,R64_CY,TOTAL_H,flip)),cr3]
     :[c0,msv(buildSVG(R64_CY,R32_CY,TOTAL_H,flip)),c1,msv(buildSVG(R32_CY,S16_CY,TOTAL_H,flip)),c2,msv(buildSVG(S16_CY,[E8_CY],TOTAL_H,flip)),c3];
 
   const regionW=CW[0]+CW[1]+CW[2]+CW[3]+CONN*3;
@@ -2685,16 +2689,19 @@ function renderBracket(){
   const season=document.getElementById('bracketSeasonSel')?.selectedOptions[0]?.text?.split(' ')[0]||'2026';
   const ff4=`<div style="margin-bottom:16px">
     <div style="font-size:10px;font-weight:800;color:#64748b;letter-spacing:2px;margin-bottom:10px">🏀 FIRST FOUR — DAYTON &nbsp;<span style="font-size:9px;font-weight:600;color:#334155">${season}</span></div>
-    <div style="display:flex;gap:10px">${[101,102,103,104].map(id=>bCard(id,190)).join('')}</div>
+    <div style="display:flex;gap:10px">${[101,102,103,104].filter(id=>bracketData[id]).map(id=>bCard(id,190)).join('')}</div>
     <div style="height:1px;background:rgba(255,255,255,0.07);margin-top:14px"></div>
   </div>`;
+
+  const g601=bracketData[601], g602=bracketData[602], g701=bracketData[701];
+  const ffDate=g=>{if(!g?.startTimeEpoch)return '';const d=new Date(g.startTimeEpoch*1000);return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});};
 
   const ctr=`<div style="flex-shrink:0;height:${SIDE_H}px;display:flex">
     ${hline(FF_CY,SIDE_H)}
     <div style="position:relative;width:${FF_W}px;height:${SIDE_H}px;flex-shrink:0">
       <div style="position:absolute;top:${ff_top-22}px;left:0;right:0;text-align:center">
         <div style="font-size:9px;font-weight:800;color:#fbbf24;letter-spacing:2px">FINAL FOUR</div>
-        <div style="font-size:8px;font-weight:600;color:#78716c">April 4 & 6, 2026</div>
+        <div style="font-size:8px;font-weight:600;color:#78716c">${ffDate(g601)}</div>
       </div>
       ${bCard(601,FF_W,ff_top)}
     </div>
@@ -2702,7 +2709,7 @@ function renderBracket(){
     <div style="position:relative;width:${CHAMP_W}px;height:${SIDE_H}px;flex-shrink:0">
       <div style="position:absolute;top:${ch_top-24}px;left:0;right:0;text-align:center">
         <div style="font-size:10px;font-weight:800;color:#f97316;letter-spacing:2px">🏆 CHAMPIONSHIP</div>
-        <div style="font-size:8px;font-weight:600;color:#78716c">April 6, 2026</div>
+        <div style="font-size:8px;font-weight:600;color:#78716c">${ffDate(g701)}</div>
       </div>
       ${bCard(701,CHAMP_W,ch_top,true)}
     </div>
@@ -2710,7 +2717,7 @@ function renderBracket(){
     <div style="position:relative;width:${FF_W}px;height:${SIDE_H}px;flex-shrink:0">
       <div style="position:absolute;top:${ff_top-22}px;left:0;right:0;text-align:center">
         <div style="font-size:9px;font-weight:800;color:#fbbf24;letter-spacing:2px">FINAL FOUR</div>
-        <div style="font-size:8px;font-weight:600;color:#78716c">April 4 & 6, 2026</div>
+        <div style="font-size:8px;font-weight:600;color:#78716c">${ffDate(g602)}</div>
       </div>
       ${bCard(602,FF_W,ff_top)}
     </div>
@@ -2741,8 +2748,10 @@ function renderBracket(){
     const natural = cont.scrollWidth;
     const scale = natural > avail ? avail / natural : 1;
     cont.style.transform = `scale(${scale})`;
+    cont.style.transformOrigin = 'top left';
     cont.style.marginBottom = scale < 1 ? `${(cont.scrollHeight * scale - cont.scrollHeight)}px` : '0';
-    wrap.style.height = scale < 1 ? `${cont.scrollHeight * scale + 40}px` : 'auto';
+    wrap.style.height = 'auto';
+    document.getElementById('bracketView').scrollTop = 0;
   });
 }
 
@@ -2753,10 +2762,11 @@ window.addEventListener('resize', ()=>{
     const cont=document.getElementById('bracketContainer');
     if(!wrap||!cont||!cont.scrollWidth) return;
     const avail=wrap.clientWidth-40;
-    const natural=cont.scrollWidth/parseFloat(cont.style.transform.replace('scale(',''))||1;
+    const natural=cont.scrollWidth;
     const scale=natural>avail?avail/natural:1;
     cont.style.transform=`scale(${scale})`;
-    wrap.style.height=scale<1?`${cont.scrollHeight*scale+40}px`:'auto';
+    cont.style.transformOrigin='top left';
+    cont.style.marginBottom=scale<1?`${(cont.scrollHeight*scale-cont.scrollHeight)}px`:'0';
   }
 });
 
