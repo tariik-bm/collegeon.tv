@@ -1,0 +1,17 @@
+{
+  "mens-basketball": {
+    "acc": {
+      "2002": [
+        { "rank":1, "team":"Maryland",       "conf":"15-1",  "overall":"32-4"  },
+        { "rank":2, "team":"Duke",           "conf":"13-3",  "overall":"31-4"  },
+        { "rank":3, "team":"Wake Forest",    "conf":"9-7",   "overall":"21-13" },
+        { "rank":4, "team":"NC State",       "conf":"9-7",   "overall":"23-11" },
+        { "rank":5, "team":"Virginia",       "conf":"7-9",   "overall":"17-12" },
+        { "rank":6, "team":"Georgia Tech",   "conf":"7-9",   "overall":"15-16" },
+        { "rank":7, "team":"North Carolina", "conf":"4-12",  "overall":"8-20"  },
+        { "rank":8, "team":"Florida State",  "conf":"4-12",  "overall":"12-17" },
+        { "rank":9, "team":"Clemson",        "conf":"4-12",  "overall":"13-17" }
+      ]
+    }
+  }
+}
